@@ -11,6 +11,7 @@
 #include "base/android/jni_android.h"
 #include "base/android/jni_array.h"
 #include "base/android/jni_string.h"
+#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/android/history_report/history_report_jni_bridge.h"
 
 #include "chrome/browser/chrome_notification_types.h"

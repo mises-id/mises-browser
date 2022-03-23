@@ -16,7 +16,9 @@ import org.chromium.chrome.browser.ServiceTabLauncher;
 import org.chromium.chrome.browser.TabState;
 import org.chromium.chrome.browser.UrlConstants;
 import org.chromium.chrome.browser.compositor.layouts.content.TabContentManager;
+import org.chromium.chrome.browser.mises.MisesController;
 import org.chromium.chrome.browser.net.spdyproxy.DataReductionProxySettings;
+import org.chromium.chrome.browser.partnercustomizations.HomepageManager;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabDelegateFactory;
 import org.chromium.chrome.browser.tabmodel.TabModel.TabLaunchType;
@@ -330,6 +332,24 @@ public class ChromeTabCreator extends TabCreatorManager.TabCreator {
         assert state.isIncognito() == mIncognito;
         mTabModel.addTab(tab, index, TabLaunchType.FROM_RESTORE);
         return tab;
+    }
+
+    @Override
+    public void openSinglePage(String url) {
+        try {
+            TraceEvent.begin("TabCreator.openSinglePage");
+
+            for (int i=0; i<mTabModel.getCount(); i++) {
+                String pageurl = mTabModel.getTabAt(i).getUrl();
+                if (pageurl.indexOf(url) != -1) {
+                    mTabModel.setIndex(i, TabSelectionType.FROM_USER);
+                    return;
+                }
+            }
+            launchUrl(url, TabModel.TabLaunchType.FROM_CHROME_UI);
+        } finally {
+            TraceEvent.end("TabCreator.openSinglePage");
+        }
     }
 
     /**

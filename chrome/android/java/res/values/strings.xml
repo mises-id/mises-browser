@@ -58,7 +58,7 @@
 
     <string name="contextual_menu_open_in_external_application">Open in external application</string>
 
-    <string name="preferences_restart_is_needed">Your changes will take effect on restart of Kiwi</string>
+    <string name="preferences_restart_is_needed">Your changes will take effect on restart of Mises</string>
     <string name="preferences_restart_now">RESTART NOW</string>
     <string name="preferences_restart_later">Later</string>
 
@@ -93,5 +93,22 @@
     <string name="website_settings_desktop_mode_disabled">Prefer mobile-optimized version of websites</string>
 
     <string name="main_menu_mobile_site">Mobile site</string>
+
+    <string name="msg_notification_service_desc">The LCD(light client daemon) provides an access to the Mises Network</string>
+    <string name="title_foreground_service_notification_running">Mises Chain LCD service is running</string>
+    <string name="title_foreground_service_notification_error">Mises Chain LCD has error, auto restart in 30s</string>
+    <string name="lbl_btn_sticky_notification_open_app">Open Mises Browser</string>
+    <string name="lbl_btn_sticky_notification_restart_lcd">Restart LCD service</string>
+    <string name="lbl_create_mises_id">Create/Restore</string>
+    <string name="lbl_my_data">My Data</string>
+    <string name="lbl_mises_discover">Mises Discover</string>
+    <string name="lbl_wallet">Wallet</string>
+    <string name="lbl_input_content">Please enter the contents&#8230;</string>
+    <string name="lbl_login">Log in</string>
+    <string name="lbl_message">Message</string>
+    <string name="lbl_login_tip">Go to login Mises ID</string>
+    <string name="lbl_auth_tip">Authorization expires,please reauthorization</string>
+    <string name="lbl_can_not_share_tip">This page can\'t share</string>
+    <string name="lbl_default_browser_tip">Make Mises your default browser</string>
 </resources>
 

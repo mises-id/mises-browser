@@ -1202,5 +1202,32 @@ android:value="true" />
             android:value="org.chromium.chrome.browser.media.remote.DefaultMediaRouteController"/>
 
         {% endblock %}
+
+
+        <service
+            android:name="org.chromium.chrome.browser.mises.MisesLCDService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name="org.chromium.chrome.browser.mises.AutoStartUpBootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_fcm_channel_id" />
+        <service android:name="org.chromium.chrome.browser.mises.MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 </manifest>

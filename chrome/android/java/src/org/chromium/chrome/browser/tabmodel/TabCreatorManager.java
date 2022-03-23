@@ -108,6 +108,14 @@ public interface TabCreatorManager {
                 TraceEvent.end("TabCreator.launchNTP");
             }
         }
+
+        public void openSinglePage(String url) {
+            try {
+                launchUrl(url, TabModel.TabLaunchType.FROM_CHROME_UI);
+            } finally {
+                TraceEvent.end("TabCreator.openSinglePage");
+            }
+        }
     }
 
     /**
