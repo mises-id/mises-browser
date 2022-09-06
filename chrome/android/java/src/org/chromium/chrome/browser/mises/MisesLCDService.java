@@ -45,6 +45,7 @@ public class MisesLCDService extends Service {
     private static final String ACTION_OPEN_APP = "ACTION_OPEN_APP";
     public static final String KEY_DATA = "KEY_DATA";
     private Handler retryHandler = new Handler();
+    private int retryCounter = 0;
 
     @Nullable
     @Override
@@ -67,6 +68,7 @@ public class MisesLCDService extends Service {
         if (intent != null) {
             if (intent.getAction() != null) {
                 if (intent.getAction() .equals(ACTION_RESTART_FOREGROUND_SERVICE)) {
+		    retryCounter = 0;
                     startLCDService();
                 } else if (intent.getAction().equals(ACTION_OPEN_APP)) {
                     String key_data = intent.getStringExtra(KEY_DATA);
@@ -179,7 +181,7 @@ public class MisesLCDService extends Service {
                         trust_nodes.add("http://w2.mises.site:26657");
                     }
                     if (chain_id.isEmpty()) {
-                        chain_id = "test";
+                        chain_id = "mainnet";
                     }
                     Random rand = new Random(System.currentTimeMillis());
                     int n = rand.nextInt(trust_nodes.size());
@@ -203,6 +205,10 @@ public class MisesLCDService extends Service {
                     node.setChainID(chain_id);
                     node.setEndpoints(primary_node, witness_nodes);
                     node.setTrust(block_height, block_hash);
+		    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+			// these android version dont support isrg_root_x1 CA, so simply make Ssl skip checking CA
+		        node.setInsecureSsl(true);
+		    }
                     node.serve("tcp://0.0.0.0:26657");
                     Log.d(TAG, "mises light node finish");
                 } catch (Exception e) {
@@ -213,9 +219,18 @@ public class MisesLCDService extends Service {
                         getString(R.string.title_foreground_service_notification_error),
                         getString(R.string.msg_notification_service_desc), false
                 ));
+		int retryDelay = 30000;
+		if (retryCounter < 0) {
+		  retryDelay = 30000;
+		} else if (retryCounter < 6) {
+		  retryDelay = (int)Math.round(Math.pow(2, retryCounter) * 30000);
+		} else {
+	 	  retryDelay = 960000;
+		}
+		retryCounter += 1;
                 retryHandler.postDelayed( () -> {
                     startLCDService();
-                }, 30000);
+                }, retryDelay);
             }
         }).start();
     }
@@ -293,7 +308,7 @@ public class MisesLCDService extends Service {
         JSONObject result = null;
         HttpURLConnection urlConnection = null;
         try {
-            URL url = new URL("https://apiv2.mises.site/api/v1/" + path);
+            URL url = new URL("https://api.alb.mises.site/api/v1/" + path);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(20000);
             urlConnection.setDoOutput(false);

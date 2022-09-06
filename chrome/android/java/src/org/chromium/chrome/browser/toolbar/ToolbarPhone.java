@@ -80,6 +80,7 @@ import org.chromium.chrome.browser.partnercustomizations.HomepageManager;
 import org.chromium.chrome.browser.partnercustomizations.PartnerBrowserCustomizations;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.tab.Tab;
+import org.chromium.chrome.browser.tabmodel.TabModel.TabLaunchType;
 import org.chromium.chrome.browser.tabmodel.TabCreatorManager;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tabmodel.TabModelSelector;
@@ -99,6 +100,7 @@ import org.chromium.content_public.browser.JavaScriptCallback;
 import org.chromium.ui.UiUtils;
 import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.interpolators.BakedBezierInterpolator;
+import org.chromium.ui.base.Clipboard;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -705,30 +707,50 @@ public class ToolbarPhone extends ToolbarLayout
                         if (tabCreator != null) {
                             tabCreator.openSinglePage("https://home.mises.site/userInfo");
                         }
-                    } else  if (v.getId() == R.id.tv_mises_discover) {
+                    } else if (v.getId() == R.id.tv_mises_discover) {
                         if (tabCreator != null) {
                             tabCreator.openSinglePage("https://home.mises.site/home/discover");
                         }
-                    } else  if (v.getId() == R.id.tv_wallet) {
+                    } else if (v.getId() == R.id.tv_wallet) {
                         if (tabCreator != null) {
                             tabCreator.openSinglePage("chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/popup.html");
                         }
-                    } else  if (v.getId() == R.id.tv_login) {
+                    } else if (v.getId() == R.id.tv_portal) {
+                        if (tabCreator != null) {
+                            tabCreator.openSinglePage("https://portal.mises.site");
+                        }
+                    } else if (v.getId() == R.id.tv_nft) {
+                        if (tabCreator != null) {
+                            tabCreator.openSinglePage("https://home.mises.site/nft");
+                        }
+                    } else if (v.getId() == R.id.tv_invite) {  
+                        if (tabCreator != null) {
+                            tabCreator.openSinglePage("https://home.mises.site/myInvitation?misesId=" + id);
+                        }
+                    } else if (v.getId() == R.id.tv_login) {
                         if (tabCreator != null) {
                             tabCreator.openSinglePage("https://home.mises.site/home/me");
                         }
-                    } else  if (v.getId() == R.id.tv_create_mises) {
+                    } else if (v.getId() == R.id.tv_create_mises) {
                         if (tabCreator != null) {
                             tabCreator.openSinglePage("https://home.mises.site/home/me");
                         }
-                    }
+                    } else if (v.getId() == R.id.tv_website || v.getId() == R.id.tv_website1) {
+                        if (tabCreator != null) {
+                            tabCreator.launchUrl("https://www.mises.site", TabLaunchType.FROM_CHROME_UI);
+                        }
+                    } else if (v.getId() == R.id.tv_id) {
+                        Clipboard.getInstance().setText(id);
+			Toast.makeText(getContext(), getContext().getString(R.string.lbl_id_copied_tip), Toast.LENGTH_SHORT).show();
+			return;
+   	            } 
                     misesUserInfoMenu.dismiss();
                 }
             });
             misesUserInfoMenu.showAtLocation(mMisesMainButton, Gravity.START | Gravity.TOP, 0, 0);
         } else if (mMisesShareButton != null && mMisesShareButton == v) {
             FirebaseAnalytics.getInstance(getContext()).logEvent("share", new Bundle());
-            String SCRIPT = "window.misesModule.getWindowInformation()";
+            String SCRIPT = "if(window.misesModule && window.misesModule.getWindowInformation){window.misesModule.getWindowInformation()} else {console.log('window.misesModule or window.misesModule.getWindowInformation is null')}";
             Context context = getContext();
             if (!(context instanceof ChromeTabbedActivity))
                 return;
@@ -738,15 +760,18 @@ public class ToolbarPhone extends ToolbarLayout
                 return;
             if (currentTab.isNativePage() || currentTab.isClosing()
                     || currentTab.isShowingErrorPage() || currentTab.isShowingSadTab()) {
+                Log.e("mises","share currentTab.isNativePage() || currentTab.isClosing() || currentTab.isShowingErrorPage() || currentTab.isShowingSadTab()");
                 Toast.makeText(getContext(), getContext().getString(R.string.lbl_can_not_share_tip), Toast.LENGTH_SHORT).show();
                 return;
             }
             currentTab.getWebContents().evaluateJavaScript(SCRIPT, jsonResult -> {
-                Log.d("luobo share msg : ", jsonResult);
+                Log.e("mises share msg : ", jsonResult);
                 if (jsonResult != null && !jsonResult.isEmpty()) {
                     try {
                         JSONObject ob = new JSONObject(jsonResult);
-                        String icon = ob.getString("icon");
+                        String icon = "";
+			if (ob.has("icon"))
+			    icon = ob.getString("icon");
                         String title = ob.getString("title");
                         String url = ob.getString("url");
                         if (MisesController.getInstance().getMisesToken().isEmpty()) {
@@ -761,10 +786,12 @@ public class ToolbarPhone extends ToolbarLayout
                         MisesShareWin shareWin = MisesShareWin.newInstance(icon, title, url);
                         shareWin.show(chromeTabbedActivity.getSupportFragmentManager(), "MisesShareWin");
                     } catch (JSONException e) {
+                        Log.e("mises", "share is not json" + e.toString());
                         Toast.makeText(getContext(), getContext().getString(R.string.lbl_can_not_share_tip), Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                 } else {
+                    Log.e("mises", "share json is null");
                     Toast.makeText(getContext(), getContext().getString(R.string.lbl_can_not_share_tip), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -1427,6 +1454,14 @@ public class ToolbarPhone extends ToolbarLayout
             mHomeButton.setAlpha(previousAlpha * floatAlpha);
             drawChild(canvas, mHomeButton, SystemClock.uptimeMillis());
             mHomeButton.setAlpha(previousAlpha);
+        }
+
+        if (mMisesMainButton != null && mMisesMainButton.getVisibility() != View.GONE) {
+            // Draw the New Tab button used in the URL view.
+            previousAlpha = mMisesMainButton.getAlpha();
+            mMisesMainButton.setAlpha(previousAlpha * floatAlpha);
+            drawChild(canvas, mMisesMainButton, SystemClock.uptimeMillis());
+            mMisesMainButton.setAlpha(previousAlpha);
         }
 
         // Draw the location/URL bar.

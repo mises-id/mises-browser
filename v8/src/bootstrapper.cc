@@ -4194,10 +4194,9 @@ EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE(harmony_class_fields)
 EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE(harmony_dynamic_import)
 EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE(harmony_import_meta)
 EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE(harmony_optional_catch_binding)
-//EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE(harmony_numeric_separator)
+EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE(harmony_numeric_separator)
 
 #undef EMPTY_INITIALIZE_GLOBAL_FOR_FEATURE
-
 void InstallPublicSymbol(Factory* factory, Handle<Context> native_context,
                          const char* name, Handle<Symbol> value) {
   Handle<JSGlobalObject> global(
@@ -4299,9 +4298,6 @@ void Genesis::InitializeGlobal_harmony_array_flatten() {
                         Builtins::kArrayPrototypeFlatMap, 1, false, DONT_ENUM);
 }
 
-void Genesis::InitializeGlobal_harmony_numeric_separator() {
-  FLAG_harmony_numeric_separator = true;
-}
 
 void Genesis::InitializeGlobal_harmony_string_matchall() {
   //if (!FLAG_harmony_string_matchall) return;
@@ -4376,6 +4372,17 @@ void Genesis::InitializeGlobal_harmony_promise_all_settled() {
         factory()->empty_string(), 1);
     native_context()->set_promise_all_settled_reject_element_shared_fun(*info);
   }
+}
+
+void Genesis::InitializeGlobal_harmony_string_replaceall() {
+  if (!FLAG_harmony_string_replaceall) return;
+
+  Handle<JSFunction> string_fun(native_context()->string_function(), isolate());
+  Handle<JSObject> string_prototype(
+      JSObject::cast(string_fun->instance_prototype()), isolate());
+
+  SimpleInstallFunction(string_prototype, "replaceAll",
+                        Builtins::kStringPrototypeReplaceAll, 2, true);
 }
 
 void Genesis::InitializeGlobal_harmony_promise_finally() {
