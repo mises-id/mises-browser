@@ -198,6 +198,9 @@
       display: none;
     }
     @media screen and (max-width:360px){
+      #bookmarks-grid, #fake-bookmarks-grid, #ideas-grid {
+        padding: 0 0 10px;
+      }
       .mises-web3-img-box,.grid-image-box{
         width: 53px;
         height: 53px;
@@ -706,11 +709,10 @@ function swap_if_ready()
 function fetch_tiles_from_most_visited(){
   if ((typeof localStorage.cachedTilesUpdate == "undefined") || ((Date.now() / 1000) - localStorage.cachedTilesUpdate) > 43200) {
     console.log("Fetching tiles from most visited because:");
-    if (typeof localStorage.cachedTilesUpdate == "undefined"){
+    if (typeof localStorage.cachedTilesUpdate == "undefined")
       console.log(" it is the first time");
-    }else{
+    else
       console.log(" last update is out of date");
-    }
     if (typeof localStorage.useCustomTiles == "undefined" || localStorage.useCustomTiles == "false") {
       if (chrome.embeddedSearch.newTabPage.mostVisitedAvailable) {
         localStorage.storedItems = JSON.stringify([]);
@@ -724,10 +726,10 @@ function fetch_tiles_from_most_visited(){
         localStorage.storedItems = JSON.stringify(storedItems);
         localStorage.cachedTilesUpdate = (Date.now() / 1000);
       }
-    } else {
-      console.log("Not fetching tiles from most visited, as we have to do once every day");
-      if (typeof localStorage.storedItems != "undefined") { var storedItems = JSON.parse(localStorage.storedItems); for (var i = 0; i < storedItems.length; i++) { add_favorite(storedItems[i]); } }
     }
+  } else {
+    console.log("Not fetching tiles from most visited, as we have to do once every day");
+    if (typeof localStorage.storedItems != "undefined") { var storedItems = JSON.parse(localStorage.storedItems); for (var i = 0; i < storedItems.length; i++) { add_favorite(storedItems[i]); } }
   }
 }
 
