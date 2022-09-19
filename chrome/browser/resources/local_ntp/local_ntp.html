@@ -275,9 +275,11 @@
           if(res.data&&res.data.is_airdropped){
             localStorage.setItem(data.misesId, true);
             showInvite()
+            console.log('cache isAirdropMisesId:'+ res.misesId);
           }
         })
       }else{
+        console.log('get cache isAirdropMisesId:'+ res.misesId);
         showInvite()
       }
     }
