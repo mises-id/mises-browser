@@ -2,7 +2,7 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file. */
 
-html {
+ html {
   /* Material Design constants */
   --md-tile-height: 104px;
   --md-tile-margin: 8px;
@@ -748,10 +748,11 @@ input:checked + .toggle::before {
 }
 
 #bookmarks-grid, #fake-bookmarks-grid, #ideas-grid {
+    margin:0 15px;
     position: relative;
-    margin-right: 2%;
-    /* margin: 0 60px 0 15px; */
-    /* margin-right: 60px; */
+    background-color: white;
+    border-radius: 15px;
+    padding: 0 0 10px;
 }
 
 #fake-bookmarks-grid {
@@ -759,20 +760,19 @@ input:checked + .toggle::before {
 }
 
 .grid-item {
-  z-index: 999999;
-  text-align: center;
-  margin: 12px;
-  float: left;
+    float: left;
+    width: 60px;
+    font-size: 10px;
+    overflow: hidden;
+    background: #fff;
+    margin: 10px;
+    text-align: center;
+    z-index: 999999;
 }
 
 .grid-item a {
-  display: block;
-}
-.grid-image {
-  height: 33px;
-  width: 33px;
-  object-fit: contain;
-  border-radius: 5px;
+    text-decoration: none;
+    color: #555;
 }
 
 #explore-section {
