@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="./local_ntp.css">
   <meta charset="utf-8">
   <meta name="google" value="notranslate">
-  <!-- <script src="./loadingImage.js"></script> -->
   <script>
     // window.chrome.embeddedSearch = {
     //   newTabPage:{}
@@ -263,6 +262,24 @@
       const container = document.getElementById('mises-web3');
       if(container) container.innerHTML = items.join('');
     })
+  }
+  chrome.embeddedSearch.mises.oninfo = res=>{
+    if(res){
+      const data = JSON.parse(res)
+      const isAirdropMisesId = localStorage.getItem(res.misesId);
+      if(!isAirdropMisesId){
+        getIsAirdrop().then(res=>{
+          if(res){
+            localStorage.setItem(res.misesId, true);
+            showInvite()
+          }
+        })
+      }
+    }
+  }
+  chrome.embeddedSearch.mises.info()
+  const getIsAirdrop = ()=>{
+    return Promise.resolve(true)
   }
 function showInvite(){
   document.getElementById('invite').style.display = 'block';
@@ -682,31 +699,31 @@ function swap_if_ready()
   }
 }
 
-function fetch_tiles_from_most_visited()
-{
+function fetch_tiles_from_most_visited(){
   if ((typeof localStorage.cachedTilesUpdate == "undefined") || ((Date.now() / 1000) - localStorage.cachedTilesUpdate) > 43200) {
-  console.log("Fetching tiles from most visited because:");
-  if (typeof localStorage.cachedTilesUpdate == "undefined"){
-    console.log(" it is the first time");
-  }else{
-    console.log(" last update is out of date");
-  }
-  if (typeof localStorage.useCustomTiles == "undefined" || localStorage.useCustomTiles == "false") {
-    if (chrome.embeddedSearch.newTabPage.mostVisitedAvailable) {
-      localStorage.storedItems = JSON.stringify([]);
-      var pages = chrome.embeddedSearch.newTabPage.mostVisited;
-      var storedItems = JSON.parse(localStorage.storedItems);
-      for (var i = 0; i < Math.min(8, pages.length); ++i) {
-         offset = storedItems.length;
-         storedItems[offset] = {url: chrome.embeddedSearch.newTabPage.getMostVisitedItemData(pages[i].rid).url}
-         add_favorite(storedItems[offset]);
-      }
-      localStorage.storedItems = JSON.stringify(storedItems);
-      localStorage.cachedTilesUpdate = (Date.now() / 1000);
+    console.log("Fetching tiles from most visited because:");
+    if (typeof localStorage.cachedTilesUpdate == "undefined"){
+      console.log(" it is the first time");
+    }else{
+      console.log(" last update is out of date");
     }
-  } else {
-    console.log("Not fetching tiles from most visited, as we have to do once every day");
-    if (typeof localStorage.storedItems != "undefined") { var storedItems = JSON.parse(localStorage.storedItems); for (var i = 0; i < storedItems.length; i++) { add_favorite(storedItems[i]); } }
+    if (typeof localStorage.useCustomTiles == "undefined" || localStorage.useCustomTiles == "false") {
+      if (chrome.embeddedSearch.newTabPage.mostVisitedAvailable) {
+        localStorage.storedItems = JSON.stringify([]);
+        var pages = chrome.embeddedSearch.newTabPage.mostVisited;
+        var storedItems = JSON.parse(localStorage.storedItems);
+        for (var i = 0; i < Math.min(8, pages.length); ++i) {
+          offset = storedItems.length;
+          storedItems[offset] = {url: chrome.embeddedSearch.newTabPage.getMostVisitedItemData(pages[i].rid).url}
+          add_favorite(storedItems[offset]);
+        }
+        localStorage.storedItems = JSON.stringify(storedItems);
+        localStorage.cachedTilesUpdate = (Date.now() / 1000);
+      }
+    } else {
+      console.log("Not fetching tiles from most visited, as we have to do once every day");
+      if (typeof localStorage.storedItems != "undefined") { var storedItems = JSON.parse(localStorage.storedItems); for (var i = 0; i < storedItems.length; i++) { add_favorite(storedItems[i]); } }
+    }
   }
 }
 
@@ -802,8 +819,8 @@ if (window.chrome.embeddedSearch.newTabPage.isIncognito || typeof localStorage.h
   // if (document.getElementById('close-explore-button'))
   //   document.getElementById('close-explore-button').addEventListener('click', close_explore);
 }
-
 </script>
+<br />&nbsp;<br />
 <script>
 <include src="./local_ntp.js">
 </script>
