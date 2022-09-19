@@ -30,7 +30,7 @@ class SearchBoxExtension {
   static void DispatchKeyCaptureChange(blink::WebLocalFrame* frame);
   static void DispatchMostVisitedChanged(blink::WebLocalFrame* frame);
   static void DispatchThemeChange(blink::WebLocalFrame* frame);
-
+  static void DispatchMisesInfoResult(blink::WebLocalFrame* frame, const base::string16& info);
  private:
   DISALLOW_IMPLICIT_CONSTRUCTORS(SearchBoxExtension);
 };

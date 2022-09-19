@@ -43,6 +43,7 @@ import android.util.Log;
 
 import org.chromium.chrome.browser.appmenu.AppMenu;
 import org.chromium.chrome.browser.mises.MisesUtil;
+import org.chromium.chrome.browser.mises.MisesController;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.base.ActivityState;
 import org.chromium.base.ApiCompatibilityUtils;
@@ -1405,6 +1406,7 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
             mContextualSuggestionsCoordinator = new ContextualSuggestionsCoordinator(
                     this, mBottomSheetController, getTabModelSelector());
         }
+	MisesController.getInstance();
 
         if (!ChromePreferenceManager.getInstance().hasShowDefaultBrowserTip()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

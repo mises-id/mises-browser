@@ -430,3 +430,16 @@ void SearchBox::DidCommitProvisionalLoad(bool is_new_navigation,
 void SearchBox::OnDestruct() {
   delete this;
 }
+
+void SearchBox::MisesInfo() {
+  embedded_search_service_->MisesInfo(base::BindOnce(&SearchBox::MisesInfoResult,
+			                       weak_ptr_factory_.GetWeakPtr()));
+}
+
+void SearchBox::MisesInfoResult(const base::string16& info) {
+	  if (can_run_js_in_renderframe_) {
+		      SearchBoxExtension::DispatchMisesInfoResult(
+				              render_frame()->GetWebFrame(), info);
+		        }
+}
+
