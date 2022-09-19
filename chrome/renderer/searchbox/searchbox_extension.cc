@@ -370,6 +370,17 @@ SearchBox* GetSearchBoxForCurrentContext() {
   return SearchBox::Get(main_frame);
 }
 
+static const char kDispatchMisesInfoResult[] =
+    "if (window.chrome &&"
+    "    window.chrome.embeddedSearch &&"
+    "    window.chrome.embeddedSearch.mises &&"
+    "    window.chrome.embeddedSearch.mises.oninfo &&"
+    "    typeof window.chrome.embeddedSearch.mises"
+    "        .oninfo === 'function') {"
+    "  window.chrome.embeddedSearch.mises.oninfo(%s);"
+    "  true;"
+    "}";
+
 static const char kDispatchChromeIdentityCheckResult[] =
     "if (window.chrome &&"
     "    window.chrome.embeddedSearch &&"
@@ -472,7 +483,7 @@ class MisesBindings : public gin::Wrappable<MisesBindings> {
       v8::Isolate* isolate) final;
 
   // Handlers for JS properties.
-  static std::string GetInfo();
+  static void GetInfo();
 
   DISALLOW_COPY_AND_ASSIGN(MisesBindings);
 };
@@ -485,11 +496,13 @@ MisesBindings::~MisesBindings() = default;
 gin::ObjectTemplateBuilder MisesBindings::GetObjectTemplateBuilder(
     v8::Isolate* isolate) {
   return gin::Wrappable<MisesBindings>::GetObjectTemplateBuilder(isolate)
-      .SetProperty("info", &MisesBindings::GetInfo);
+      .SetMethod("info", &MisesBindings::GetInfo);
 }
 
-std::string MisesBindings::GetInfo() {
-  return android::MisesController::GetInstance()->getMisesUserInfo();  
+void MisesBindings::GetInfo() {
+  SearchBox* search_box = GetSearchBoxForCurrentContext();
+  if (!search_box) return ;
+  search_box->MisesInfo();  
 } 
 
 class SearchBoxBindings : public gin::Wrappable<SearchBoxBindings> {
@@ -923,6 +936,12 @@ void SearchBoxExtension::Install(blink::WebLocalFrame* frame) {
   chrome->Set(gin::StringToSymbol(isolate, "embeddedSearch"), embedded_search);
 }
 
+void SearchBoxExtension::DispatchMisesInfoResult(blink::WebLocalFrame* frame, const base::string16& info) {
+  std::string escaped_info = base::GetQuotedJSONString(info);
+  blink::WebString script(blink::WebString::FromUTF8(base::StringPrintf(
+      kDispatchMisesInfoResult, escaped_info.c_str())));
+  Dispatch(frame, script);
+}
 // static
 void SearchBoxExtension::DispatchChromeIdentityCheckResult(
     blink::WebLocalFrame* frame,

@@ -268,18 +268,22 @@
       const data = JSON.parse(res)
       const isAirdropMisesId = localStorage.getItem(res.misesId);
       if(!isAirdropMisesId){
-        getIsAirdrop().then(res=>{
-          if(res){
-            localStorage.setItem(res.misesId, true);
+        getIsAirdrop(data.misesId).then(res=>{
+          if(res.data&&res.data.is_airdropped){
+            localStorage.setItem(data.misesId, true);
             showInvite()
           }
         })
+      }else{
+        showInvite()
       }
     }
   }
   chrome.embeddedSearch.mises.info()
-  const getIsAirdrop = ()=>{
-    return Promise.resolve(true)
+  const getIsAirdrop = (misesId)=>{
+    return new Promise((reslove,reject)=>{
+      fetch('https://api.alb.mises.site/api/v1/mises_user/did:mises:'+misesId).then(res=>res.json()).then(reslove).catch(reject);
+    })
   }
 function showInvite(){
   document.getElementById('invite').style.display = 'block';

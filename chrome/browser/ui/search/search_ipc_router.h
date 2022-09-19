@@ -78,6 +78,7 @@ class SearchIPCRouter : public content::WebContentsObserver,
 
     // Called when a custom background is selected on the NTP.
     virtual void OnSetCustomBackgroundURL(const GURL& url) = 0;
+
   };
 
   // An interface to be implemented by consumers of SearchIPCRouter objects to
@@ -170,6 +171,7 @@ class SearchIPCRouter : public content::WebContentsObserver,
       std::unique_ptr<EmbeddedSearchClientFactory> factory) {
     embedded_search_client_factory_ = std::move(factory);
   }
+  void MisesInfo(MisesInfoCallback callback) override;
 
  private:
   friend class SearchIPCRouterPolicyTest;
