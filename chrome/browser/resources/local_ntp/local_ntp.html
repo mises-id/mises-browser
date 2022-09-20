@@ -7,11 +7,13 @@
   <link rel="stylesheet" href="./local_ntp.css">
   <meta charset="utf-8">
   <meta name="google" value="notranslate">
+  <script src="./loadingImage.js"></script>
   <script>
-    // window.chrome.embeddedSearch = {
-    //   newTabPage:{}
-    // }
-    <include src="./loadingImage.js" />
+    
+    window.chrome.embeddedSearch = {
+      newTabPage:{}
+    }
+    // <include src="./loadingImage.js" />
     if (window.chrome.embeddedSearch.newTabPage.isIncognito) document.body.style.backgroundColor='black';
   </script>
   <style>
@@ -197,7 +199,7 @@
     .chrome-embedded-search .web3-site{
       display: none;
     }
-    @media screen and (max-width:360px){
+    @media screen and (max-width:370px){
       #bookmarks-grid, #fake-bookmarks-grid, #ideas-grid {
         padding: 0 0 10px;
       }
@@ -221,9 +223,8 @@
       }
       .grid-item{
         width: 55px;
-        margin: 7px;
       }
-      .mises-web3-item img{
+      .mises-web3-item img,.grid-image-box img{
         width: 28px;
         height: 28px;
       }
@@ -250,10 +251,11 @@
     </div>
   </div>
 
-  <!-- <script src="./local_ntp.js"></script> -->
+<script src="./local_ntp.js"></script>
 <script>
+  const url = 'https://api.test.mises.site'
   window.onload = ()=>{
-    fetch('https://api.alb.mises.site/website/recommend.json').then(res=>{
+    fetch(url+'/website/recommend.json').then(res=>{
       return res.json()
     }).then(res=>{
       if(!Array.isArray(res)){
@@ -287,7 +289,7 @@
   chrome.embeddedSearch.mises.info()
   const getIsAirdrop = (misesId)=>{
     return new Promise((reslove,reject)=>{
-      fetch('https://api.alb.mises.site/api/v1/mises_user/did:mises:'+misesId).then(res=>res.json()).then(reslove).catch(reject);
+      fetch(url+'/api/v1/mises_user/did:mises:'+misesId).then(res=>res.json()).then(reslove).catch(reject);
     })
   }
 function showInvite(){
@@ -340,7 +342,7 @@ function goToPage2()
 <script>
 if (window.chrome.embeddedSearch.newTabPage.isIncognito)
 {
-  document.getElementById('add-button').style.display='none';
+  // document.getElementById('add-button').style.display='none';
 }
 </script>
 
@@ -393,12 +395,15 @@ if (window.chrome.embeddedSearch.newTabPage.isIncognito)
   display: none;
 }
 </style>
-    <div style="position: absolute; top: 3px; right: 18px; z-index: 99999999">
+    <!-- <div style="position: absolute; top: 0px; right: 5px; z-index: 99999999">
     <div class="plus-item" role="button" aria-label="Add new tile" title="Add new tile" id="add-button">+</div>
-    </div>
+    </div> -->
     <div id="fake-bookmarks-grid"  style="display: none">
     </div>
-    <div id="bookmarks-grid" class="full-hidden">
+    <!-- <div class="box" style="margin-top:0">
+      
+    </div> -->
+    <div id="bookmarks-grid">
     </div>
 <span id="explore-section" style="display: none">
 <div style="clear: both;"></div>
@@ -430,7 +435,7 @@ function instant_grid()
   if (typeof localStorage.cachedGrid != "undefined") {
       replaceInnerHTML(document.getElementById('fake-bookmarks-grid'), localStorage.cachedGrid);
       document.getElementById('fake-bookmarks-grid').style.cssText = localStorage.cachedGridStyle;
-      document.getElementById('fake-bookmarks-grid').style.display = 'block';
+      document.getElementById('fake-bookmarks-grid').style.display = 'grid';
   }
 }
 
@@ -473,7 +478,7 @@ catch (err) {
 var must_clear_news = false;
 var has_valid_foryou_entries = false;
 var last_offset_rendered = 0;
-document.getElementById('add-button').addEventListener('click', create_new_item);
+// document.getElementById('add-button').addEventListener('click', create_new_item);
 
 var longpress = false;
 var presstimer = null;
@@ -571,7 +576,15 @@ function remove_favorite(e)
   item = e.target;
   item = item.parentNode;
   console.log("Removing item");
-  globalGrid.disconnect(item);
+  console.log(item)
+  bookmarksGrid.removeChild(item);
+  const items = bookmarksGrid.getElementsByClassName('grid-item')
+  localStorage.storedItems = JSON.stringify([]);
+  Array.prototype.forEach.call(items, function (el) { add_to_storage(el); });
+  window.setTimeout(function () { save_grid_snapshot(); }, 500);
+  localStorage.useCustomTiles = "true";
+  console.log("Item removed");
+  // globalGrid.disconnect(item);
 }
 
 var nItemsAdded = 0;
@@ -580,7 +593,7 @@ function add_favorite_idea(name, click_url, impression_url, image_url)
 {
   var rootDomain = 'idea-' + name;
   var innerDiv = document.createElement('div');
-  innerDiv.className = 'mises-web3-item grid-item grid-idea';
+  innerDiv.className = 'grid-item grid-idea';
   var cachedImage = localStorage.getItem('icon-' + rootDomain);
   localStorage.setItem('lastShown-' + rootDomain, Math.floor(Date.now() / 1000));
   var imageUri = null;
@@ -626,7 +639,7 @@ function add_favorite(item)
   // and m.wikipedia.org to become wikipedia.org
   var rootDomain = psl.get(parser.hostname);
   var innerDiv = document.createElement('div');
-  innerDiv.className = 'grid-item mises-web3-item';
+  innerDiv.className = 'grid-item';
   var cachedImage = localStorage.getItem('icon-' + rootDomain);
   localStorage.setItem('lastShown-' + rootDomain, Math.floor(Date.now() / 1000));
   var imageUri = null;
@@ -673,8 +686,9 @@ var ideasGrid = document.getElementById("ideas-grid");
 
 function save_grid_snapshot()
 {
-  if (!document.getElementById('bookmarks-grid').style.cssText)
-    return ;
+  console.log(document.getElementById('bookmarks-grid').style.cssText)
+  // if (!document.getElementById('bookmarks-grid').style.cssText)
+  //   return ;
   // Maximum 1 update per 0.1s (100ms)
   if ((typeof localStorage.cachedGridUpdate == "undefined") || ((Date.now() / 1000) - localStorage.cachedGridUpdate) >= 0.1) {
     var parser = document.createElement('span');
@@ -683,7 +697,7 @@ function save_grid_snapshot()
     for (var i = 0; i < elementsToIgnore.length; i++)
       elementsToIgnore[i].remove();
     localStorage.cachedGrid = parser.innerHTML;
-    localStorage.cachedGridStyle = document.getElementById('bookmarks-grid').style.cssText;
+    // localStorage.cachedGridStyle = document.getElementById('bookmarks-grid').style.cssText;
 //    console.log("Saving grid snapshot and style is " + localStorage.cachedGridStyle);
     localStorage.cachedGridUpdate = (Date.now() / 1000);
   }
@@ -701,11 +715,11 @@ function add_to_storage(el)
 
 function swap_if_ready()
 {
-  if (bookmarksGrid.style.cssText.includes("height"))
-  {
+  // if (bookmarksGrid.style.cssText.includes("height"))
+  // {
     document.getElementById('fake-bookmarks-grid').style.display='none';
     bookmarksGrid.classList.remove("full-hidden");
-  }
+  // }
 }
 
 function fetch_tiles_from_most_visited(){

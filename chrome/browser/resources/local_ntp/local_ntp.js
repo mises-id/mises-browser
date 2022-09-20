@@ -1031,7 +1031,7 @@ function setup_grid()
     if (typeof localStorage.storedItems == "undefined")
       window.setTimeout(function () { if (typeof localStorage.storedItems == "undefined") { fetch_tiles_from_most_visited(); globalGrid.appendNew(); swap_if_ready(); } }, 8000);
   }
-  grid.appendNew();
+  // grid.appendNew();
   swap_if_ready();
   window.setTimeout(function () { swap_if_ready(); }, 10);
   window.setTimeout(function () { swap_if_ready(); }, 100);
