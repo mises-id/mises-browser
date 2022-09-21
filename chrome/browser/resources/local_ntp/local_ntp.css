@@ -755,7 +755,7 @@ input:checked + .toggle::before {
     background-color: white;
     border-radius: 15px;
     display: grid;
-    padding: 0 15px;
+    /* padding: 0 15px; */
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 
