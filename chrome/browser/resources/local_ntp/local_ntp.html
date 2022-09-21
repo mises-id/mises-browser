@@ -238,8 +238,10 @@
     <div class="mises-site-container" id="mises-sites">
       <a class="mises-site-item" href="https://portal.mises.site/"><img src="./images/Staking@2x.png" alt="Staking"/><p>Staking</p></a>
       <a class="mises-site-item" href="https://home.mises.site/"><img src="./images/Discover@2x.png" alt="Discover"/><p>Discover</p></a>
-      <a class="mises-site-item" id="airdrop" href="https://home.mises.site/airdrop"><img src="./images/Airdrop@2x.png" alt="Airdrop"/><p>Airdrop</p></a>
-      <a class="mises-site-item" style="display:none" id="invite" href="https://home.mises.site/myInvitation"><img src="./images/Invite@2x.png" alt="Invite"/><p>Invite</p></a>
+      <div style="visibility:hidden" id="airdrop-box">
+        <a class="mises-site-item" id="airdrop" href="https://home.mises.site/airdrop"><img src="./images/Airdrop@2x.png" alt="Airdrop"/><p>Airdrop</p></a>
+        <a class="mises-site-item" style="display:none" id="invite" href="https://home.mises.site/myInvitation"><img src="./images/Invite@2x.png" alt="Invite"/><p>Invite</p></a>
+      </div>
     </div>
     <div class="box">
       <p class="web3-site-title-box">
@@ -275,21 +277,32 @@
           if(res.data&&res.data.is_airdropped){
             localStorage.setItem(data.misesId, true);
             showInvite()
+            showBox()
             console.log('cache isAirdropMisesId:'+ res.misesId);
+          }else{
+            showBox()
           }
+        }).catch(()=>{
+          showBox()
         })
       }else{
         console.log('get cache isAirdropMisesId:'+ res.misesId);
         showInvite()
+        showBox()
       }
+    }else{
+      showBox()
     }
   }
   chrome.embeddedSearch.mises.info()
-  const getIsAirdrop = (misesId)=>{
+function getIsAirdrop(misesId){
     return new Promise((reslove,reject)=>{
       fetch(url+'/api/v1/mises_user/did:mises:'+misesId).then(res=>res.json()).then(reslove).catch(reject);
     })
   }
+function showBox(){
+  document.getElementById('airdrop-box').style.visibility = 'unset';
+}
 function showInvite(){
   document.getElementById('invite').style.display = 'block';
   document.getElementById('airdrop').style.display = 'none';
