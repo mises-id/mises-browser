@@ -8,7 +8,6 @@
   <meta charset="utf-8">
   <meta name="google" value="notranslate">
   <script>
-    
     // window.chrome.embeddedSearch = {
     //   newTabPage:{}
     // }
@@ -126,20 +125,19 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       background: linear-gradient(to bottom, white, transparent);
-      padding: 23px 15px 11px;
+      padding-top: 15px;
     }
     .mises-site-item img{
-      width: 75px;
-      height: 75px;
+      width: 50px;
+      height: 50px;
     }
     .mises-site-item{
       display: block;
       text-align: center;
     }
     .mises-site-item p{
-      margin: 0;
+      margin: 8px 0 0 ;
       font-size: 14px;
-      font-weight: bold;
       color: #333333;
     }
     .box{
@@ -235,17 +233,33 @@
     .closeImg{
       z-index: 2;
     }
+    .chrome-site{
+      display: flex;
+      justify-content: end;
+      margin: 0 calc((25% - 60px) / 2);
+      padding: 18px 0;
+      font-size: 14px;
+      font-weight: 400;
+      color: #666666;
+      align-items: center;
+    }
+    .add-icon{
+      font-size: 20px;
+      display: inline-block;
+      margin-left: 3px;
+    }
+    #add-button{
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+    #add-button img{
+      width: 9px;
+      margin-left: 2px;
+    }
     @media screen and (max-width:370px){
-      .web3-site-title-box{
+      .web3-site-title-box,.chrome-site{
         margin: 0 calc((25% - 53px) / 2);
-      }
-      .mises-web3-img-box,.grid-image-box{
-        width: 53px;
-        height: 53px;
-      }
-      .mises-site-item img{
-        width: 60px;
-        height: 60px;
       }
       .web3-site-title{
         font-size: 16px;
@@ -263,7 +277,10 @@
 <body>
   <div class="web3-site">
     <div class="mises-site-container" id="mises-sites">
-      <a class="mises-site-item" href="https://portal.mises.site/"><img src="./images/Staking@2x.png" alt="Staking"/><p>Staking</p></a>
+      <a class="mises-site-item" href="https://portal.mises.site/">
+        <img src="./images/Staking@2x.png" alt="Staking"/>
+        <p>Staking</p>
+      </a>
       <a class="mises-site-item" href="https://home.mises.site/"><img src="./images/Discover@2x.png" alt="Discover"/><p>Discover</p></a>
       <div style="visibility:hidden" id="airdrop-box">
         <a class="mises-site-item" id="airdrop" href="https://home.mises.site/airdrop"><img src="./images/Airdrop@2x.png" alt="Airdrop"/><p>Airdrop</p></a>
@@ -282,14 +299,14 @@
 <script>
   const url = 'https://api.alb.mises.site'
   window.onload = ()=>{
-    fetch(url+'/website/recommend.json').then(res=>{
+    fetch('https://web3.mises.site/website/recommend.json').then(res=>{
       return res.json()
     }).then(res=>{
       if(!Array.isArray(res)){
         return 
       }
       const items = res.map(val=>{
-        return '<a class="mises-web3-item" href="'+ val.url+'"><div class="mises-web3-img-box"><img src="'+val.logo+'" alt="'+val.title+'"/></div><p class="mises-web3-title">'+val.title+'</p></a>'
+        return '<a class="mises-web3-item" href="'+ val.url+'"><div class="mises-web3-img-box"><img src="'+val.logo+'" alt="'+val.title+'" onError="invalidate_image(this)"/></div><p class="mises-web3-title">'+val.title+'</p></a>'
       })
       const container = document.getElementById('mises-web3');
       if(container) container.innerHTML = items.join('');
@@ -380,7 +397,7 @@ function goToPage2()
 <script>
 if (window.chrome.embeddedSearch.newTabPage.isIncognito)
 {
-  // document.getElementById('add-button').style.display='none';
+  document.getElementById('add-button').style.display='none';
 }
 </script>
 
@@ -418,29 +435,11 @@ if (window.chrome.embeddedSearch.newTabPage.isIncognito)
         <button id="fakebox-microphone" hidden></button>
       </div>
     </div>
-
-<style>
-.full-hidden {
-  opacity: 0 !important;
-  position: absolute !important;
-  top: -9999999px;
-  left: -9999999px;
-  z-index: -99999;
-  width: 100vw !important;
-}
-
-.closeImgInvisible {
-  display: none;
-}
-</style>
-    <!-- <div style="position: absolute; top: 0px; right: 5px; z-index: 99999999">
+    <div style="position: absolute; top: 0px; right: 17px; z-index: 99999999">
     <div class="plus-item" role="button" aria-label="Add new tile" title="Add new tile" id="add-button">+</div>
-    </div> -->
+    </div>
     <div id="fake-bookmarks-grid"  style="display: none">
     </div>
-    <!-- <div class="box" style="margin-top:0">
-      
-    </div> -->
     <div id="bookmarks-grid">
     </div>
 <span id="explore-section" style="display: none">
@@ -516,7 +515,7 @@ catch (err) {
 var must_clear_news = false;
 var has_valid_foryou_entries = false;
 var last_offset_rendered = 0;
-// document.getElementById('add-button').addEventListener('click', create_new_item);
+document.getElementById('add-button').addEventListener('click', create_new_item);
 
 var longpress = false;
 var presstimer = null;
@@ -624,7 +623,6 @@ function remove_favorite(e)
   console.log("Item removed");
   // globalGrid.disconnect(item);
 }
-
 var nItemsAdded = 0;
 
 function add_favorite_idea(name, click_url, impression_url, image_url)
@@ -756,7 +754,7 @@ function swap_if_ready()
   // if (bookmarksGrid.style.cssText.includes("height"))
   // {
     document.getElementById('fake-bookmarks-grid').style.display='none';
-    bookmarksGrid.classList.remove("full-hidden");
+    // bookmarksGrid.classList.remove("full-hidden");
   // }
 }
 
@@ -857,8 +855,8 @@ function create_new_item()
   storedItems[offset] = {url: url}
   add_favorite(storedItems[offset]);
   localStorage.storedItems = JSON.stringify(storedItems);
-  globalGrid.toggle("scaleWithFade");
-  globalGrid.appendNew();
+  // globalGrid.toggle("scaleWithFade");
+  // globalGrid.appendNew();
   window.setTimeout(function () { save_grid_snapshot(); }, 200);
   window.setTimeout(function () { save_grid_snapshot(); }, 800);
   localStorage.useCustomTiles = "true";
