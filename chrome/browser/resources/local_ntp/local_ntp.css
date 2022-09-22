@@ -89,7 +89,7 @@ button {
   height: 100%;
   position: relative;
   z-index: 1;
-  padding:0 15px;
+  /* padding:0 15px; */
   /* width: 98%; */
 }
 
@@ -755,7 +755,9 @@ input:checked + .toggle::before {
     background-color: white;
     border-radius: 15px;
     display: grid;
+    margin: 0 15px;
     /* padding: 0 15px; */
+    /* padding-top: 6px; */
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 
@@ -765,7 +767,7 @@ input:checked + .toggle::before {
 
 .grid-item {
     /* float: left; */
-    width: 60px;
+    /* width: 60px; */
     font-size: 13px;
     overflow: hidden;
     background: #fff;
