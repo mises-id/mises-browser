@@ -22,7 +22,7 @@ import("channel.gni")
 import("java_sources.gni")
 import("static_initializers.gni")
 
-manifest_package = "com.kiwibrowser.browser.classic"
+manifest_package = "site.mises.browser"
 
 chrome_public_jinja_variables = default_chrome_public_jinja_variables +
                                 [ "manifest_package=$manifest_package" ]
@@ -273,6 +273,8 @@ android_library("chrome_java") {
     "//third_party/android_tools:android_support_v7_gridlayout_java",
     "//third_party/android_tools:android_support_v7_mediarouter_java",
     "//third_party/android_tools:android_support_v7_recyclerview_java",
+    "//third_party/android_deps:com_android_installreferrer_java",
+    "//third_party/android_deps:com_android_playcore_java",
     "//third_party/blink/public:android_mojo_bindings_java",
     "//third_party/blink/public:blink_headers_java",
     "//third_party/cacheinvalidation:cacheinvalidation_javalib",
@@ -281,6 +283,11 @@ android_library("chrome_java") {
     "//third_party/gif_player:gif_player_java",
     "//third_party/jsr-305:jsr_305_javalib",
     "//third_party/leakcanary:leakcanary_java",
+    "//third_party/mises:mises_light_node_java",
+    "//third_party/glide:com_kirich1409_svgimageloaderplugins_java",
+    "//third_party/glide:com_github_bumptech_glide_glide_java",
+    "//third_party/firebase:com_google_firebase_firebase_messaging_java",
+    "//third_party/firebase:com_google_firebase_firebase_analytics_java",
     "//third_party/protobuf:protobuf_lite_javalib",
     "//ui/android:ui_java",
     "//ui/base/mojo:mojo_bindings_java",
@@ -1105,6 +1112,8 @@ chrome_public_apk_tmpl_shared("chrome_public_apk") {
   if (_add_unwind_tables_in_chrome_public_apk) {
     shared_library_for_unwind_asset = "chrome"
   }
+  deps = [ "//third_party/mises:libmises_light_node" ]
+  loadable_modules = [ "${root_out_dir}/libgojni.so" ]
 }
 
 chrome_public_apk_tmpl_shared("chrome_public_apk_for_test") {

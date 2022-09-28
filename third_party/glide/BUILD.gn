@@ -1,0 +1,64 @@
+import("//build/config/android/rules.gni")
+
+android_aar_prebuilt("com_github_bumptech_glide_glide_java") {
+  aar_path = "glide-4.9.0.aar"
+  deps = [
+    "//third_party/android_deps:android_support_v7_appcompat_java",
+    ":com_github_bumptech_glide_annotations_java",
+    ":com_github_bumptech_glide_disklrucache_java",
+    ":com_github_bumptech_glide_gifdecoder_java",
+  ]
+}
+
+java_prebuilt("com_github_bumptech_glide_annotations_java") {
+  jar_path = "annotations-4.9.0.jar"
+  supports_android = true
+  visibility = [ ":*" ]
+}
+
+java_prebuilt("com_github_bumptech_glide_disklrucache_java") {
+  jar_path = "disklrucache-4.9.0.jar"
+  supports_android = true
+  visibility = [ ":*" ]
+}
+
+android_aar_prebuilt("com_github_bumptech_glide_gifdecoder_java") {
+  aar_path = "gifdecoder-4.9.0.aar"
+  visibility = [ ":*" ]
+  deps = [
+    "//third_party/android_deps:com_android_support_support_annotations_java",
+  ]
+}
+
+android_aar_prebuilt("com_caverock_androidsvg_java") {
+  aar_path = "androidsvg-aar-1.4.aar"
+  visibility = [ ":*" ]
+  deps = [
+  ]
+}
+java_annotation_processor("glide_annotation_processor") {
+   jar_path = "compiler-4.9.0.jar"
+   main_class = "com.bumptech.glide.annotation.compiler.GlideAnnotationProcessor"
+  deps = [
+    ":com_github_bumptech_glide_annotations_java",
+  ]
+}
+android_java_prebuilt("com_kirich1409_svgplugin_java") {
+  annotation_processor_deps = [ ":glide_annotation_processor" ]
+  jar_path = "svg-glide4-plugin-1.1.1.jar"
+  deps = [
+    ":com_caverock_androidsvg_java",
+   ":com_github_bumptech_glide_annotations_java",
+    ":com_github_bumptech_glide_glide_java"
+  ]
+}
+android_library("com_kirich1409_svgimageloaderplugins_java") {
+  annotation_processor_deps = [ ":glide_annotation_processor" ]
+  chromium_code = false
+  java_files = [
+    "SvgGlideModule.java",
+  ]
+  deps = [
+    ":com_kirich1409_svgplugin_java",
+  ]
+}

@@ -2423,17 +2423,12 @@ void BytecodeGraphBuilder::VisitTestReferenceEqual() {
   environment()->BindAccumulator(result);
 }
 
-void BytecodeGraphBuilder::BuildTestingOp(const Operator* op) {
-  PrepareEagerCheckpoint();
-  Node* left =
-      environment()->LookupRegister(bytecode_iterator().GetRegisterOperand(0));
-  Node* right = environment()->LookupAccumulator();
-  Node* node = NewNode(op, left, right);
-  environment()->BindAccumulator(node, Environment::kAttachFrameState);
-}
-
 void BytecodeGraphBuilder::VisitTestIn() {
-  BuildTestingOp(javascript()->HasProperty());
+  PrepareEagerCheckpoint();
+  Node* object = environment()->LookupAccumulator();
+  Node* key = environment()->LookupRegister(bytecode_iterator().GetRegisterOperand(0));
+  Node* node = NewNode(javascript()->HasProperty(), object, key);
+  environment()->BindAccumulator(node, Environment::kAttachFrameState);
 }
 
 void BytecodeGraphBuilder::VisitTestInstanceOf() {
@@ -2641,6 +2636,16 @@ void BytecodeGraphBuilder::VisitJumpIfNotUndefinedConstant() {
 }
 
 void BytecodeGraphBuilder::VisitJumpLoop() { BuildJump(); }
+
+void BytecodeGraphBuilder::VisitJumpIfUndefinedOrNull() {
+  BuildJumpIfEqual(jsgraph()->UndefinedConstant());
+  BuildJumpIfEqual(jsgraph()->NullConstant());
+}
+
+void BytecodeGraphBuilder::VisitJumpIfUndefinedOrNullConstant() {
+  BuildJumpIfEqual(jsgraph()->UndefinedConstant());
+  BuildJumpIfEqual(jsgraph()->NullConstant());
+}
 
 void BytecodeGraphBuilder::BuildSwitchOnSmi(Node* condition) {
   interpreter::JumpTableTargetOffsets offsets =

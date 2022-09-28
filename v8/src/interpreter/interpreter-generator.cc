@@ -1813,7 +1813,7 @@ IGNITION_HANDLER(TestIn, InterpreterAssembler) {
   Node* object = GetAccumulator();
   Node* context = GetContext();
 
-  SetAccumulator(HasProperty(object, property, context, kHasProperty));
+  SetAccumulator(HasProperty(context, object, property, kHasProperty));
   Dispatch();
 }
 
@@ -2206,6 +2206,42 @@ IGNITION_HANDLER(JumpIfNotUndefinedConstant, InterpreterAssembler) {
   Node* accumulator = GetAccumulator();
   Node* relative_jump = LoadAndUntagConstantPoolEntryAtOperandIndex(0);
   JumpIfWordNotEqual(accumulator, UndefinedConstant(), relative_jump);
+}
+
+
+// JumpIfUndefinedOrNull <imm>
+//
+// Jump by the number of bytes represented by an immediate operand if the object
+// referenced by the accumulator is the undefined constant or the null constant.
+IGNITION_HANDLER(JumpIfUndefinedOrNull, InterpreterAssembler) {
+  Node* accumulator = GetAccumulator();
+
+  Label do_jump(this);
+  GotoIf(IsUndefined(accumulator), &do_jump);
+  GotoIf(IsNull(accumulator), &do_jump);
+  Dispatch();
+
+  BIND(&do_jump);
+  Node* relative_jump = BytecodeOperandUImmWord(0);
+  Jump(relative_jump);
+}
+
+// JumpIfUndefinedOrNullConstant <idx>
+//
+// Jump by the number of bytes in the Smi in the |idx| entry in the constant
+// pool if the object referenced by the accumulator is the undefined constant or
+// the null constant.
+IGNITION_HANDLER(JumpIfUndefinedOrNullConstant, InterpreterAssembler) {
+  Node* accumulator = GetAccumulator();
+
+  Label do_jump(this);
+  GotoIf(IsUndefined(accumulator), &do_jump);
+  GotoIf(IsNull(accumulator), &do_jump);
+  Dispatch();
+
+  BIND(&do_jump);
+  Node* relative_jump = LoadAndUntagConstantPoolEntryAtOperandIndex(0);
+  Jump(relative_jump);
 }
 
 // JumpIfJSReceiver <imm>

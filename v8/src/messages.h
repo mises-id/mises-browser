@@ -489,6 +489,8 @@ class ErrorUtils : public AllStatic {
     "Cannot supply flags when constructing one RegExp from another")           \
   T(RegExpNonObject, "% getter called on non-object %")                        \
   T(RegExpNonRegExp, "% getter called on non-RegExp object")                   \
+T(RegExpGlobalInvokedOnNonGlobal,                                            \
+		    "% called with a non-global RegExp argument")                              \
   T(ResolverNotAFunction, "Promise resolver % is not a function")              \
   T(ReturnMethodNotCallable, "The iterator's 'return' method is not callable") \
   T(SharedArrayBufferTooShort,                                                 \
@@ -754,7 +756,11 @@ class ErrorUtils : public AllStatic {
   T(DataCloneDeserializationError, "Unable to deserialize cloned data.")       \
   T(DataCloneDeserializationVersionError,                                      \
     "Unable to deserialize cloned data due to invalid or unsupported "         \
-    "version.")
+    "version.") \
+  T(OptionalChainingNoNew, "Invalid optional chain from new expression")       \
+  T(OptionalChainingNoSuper, "Invalid optional chain from super property")     \
+  T(OptionalChainingNoTemplate, "Invalid tagged template on optional chain")
+
 
 class MessageTemplate {
  public:

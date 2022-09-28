@@ -208,29 +208,21 @@ DEFINE_IMPLICATION(harmony_class_fields, harmony_private_fields)
 // Update bootstrapper.cc whenever adding a new feature flag.
 
 // Features that are still work in progress (behind individual flags).
-#define HARMONY_INPROGRESS_BASE(V)                                    \
-  V(harmony_do_expressions, "harmony do-expressions")                 \
-  V(harmony_class_fields, "harmony fields in class literals")         \
-  V(harmony_static_fields, "harmony static fields in class literals") \
-  V(harmony_array_flatten, "harmony Array.prototype.flat{ten,Map}")
+#define HARMONY_INPROGRESS_BASE(V)                                   \
+  V(harmony_do_expressions, "harmony do-expressions")                 
 
 #ifdef V8_INTL_SUPPORT
 #define HARMONY_INPROGRESS(V) \
-  HARMONY_INPROGRESS_BASE(V)  \
-  V(harmony_locale, "Intl.Locale")
+  HARMONY_INPROGRESS_BASE(V)  
 #else
 #define HARMONY_INPROGRESS(V) HARMONY_INPROGRESS_BASE(V)
 #endif
 
 // Features that are complete (but still behind --harmony/es-staging flag).
-#define HARMONY_STAGED(V)                                                  \
-  V(harmony_public_fields, "harmony public fields in class literals")      \
-  V(harmony_private_fields, "harmony private fields in class literals")    \
-  V(harmony_numeric_separator, "harmony numeric separator between digits") \
-  V(harmony_string_matchall, "harmony String.prototype.matchAll")
+#define HARMONY_STAGED(V)                                                  
 
 // Features that are shipping (turned on by default, but internal flag remains).
-#define HARMONY_SHIPPING(V)                                                   \
+#define HARMONY_SHIPPING_BASE(V)                                                   \
   V(harmony_string_trimming, "harmony String.prototype.trim{Start,End}")      \
   V(harmony_sharedarraybuffer, "harmony sharedarraybuffer")                   \
   V(harmony_regexp_named_captures, "harmony regexp named captures")           \
@@ -241,7 +233,24 @@ DEFINE_IMPLICATION(harmony_class_fields, harmony_private_fields)
   V(harmony_import_meta, "harmony import.meta property")                      \
   V(harmony_bigint, "harmony arbitrary precision integers")                   \
   V(harmony_dynamic_import, "harmony dynamic import")                         \
-  V(harmony_array_prototype_values, "harmony Array.prototype.values")
+  V(harmony_array_prototype_values, "harmony Array.prototype.values")         \
+  V(harmony_numeric_separator, "harmony numeric separator between digits")    \
+  V(harmony_string_matchall, "harmony String.prototype.matchAll")             \
+  V(harmony_public_fields, "harmony public fields in class literals")      \
+  V(harmony_private_fields, "harmony private fields in class literals")    \
+  V(harmony_class_fields, "harmony fields in class literals")         \
+  V(harmony_static_fields, "harmony static fields in class literals") \
+  V(harmony_array_flatten, "harmony Array.prototype.flat{ten,Map}") \
+  V(harmony_string_replaceall, "harmony String.prototype.replaceAll") \
+  V(harmony_promise_all_settled, "harmony Promise.allSettled")
+
+#ifdef V8_INTL_SUPPORT
+#define HARMONY_SHIPPING(V) \
+		  HARMONY_SHIPPING_BASE(V)  \
+	  V(harmony_locale, "Intl.Locale")
+#else
+#define HARMONY_SHIPPING(V) HARMONY_SHIPPING_BASE(V)
+#endif
 
 // Once a shipping feature has proved stable in the wild, it will be dropped
 // from HARMONY_SHIPPING, all occurrences of the FLAG_ variable are removed,

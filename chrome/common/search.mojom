@@ -73,6 +73,8 @@ interface EmbeddedSearch {
 
   // Updates the NTP custom background preferences.
   SetCustomBackgroundURL(url.mojom.Url url);
+
+  MisesInfo() => (mojo_base.mojom.String16 info);
 };
 
 [Native]

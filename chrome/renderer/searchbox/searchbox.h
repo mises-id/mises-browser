@@ -121,6 +121,8 @@ class SearchBox : public content::RenderFrameObserver,
 
   // Updates the NTP custom background preferences.
   void SetCustomBackgroundURL(const GURL& background_url);
+ 
+  void MisesInfo();
 
   bool is_focused() const { return is_focused_; }
   bool is_input_in_progress() const { return is_input_in_progress_; }
@@ -144,7 +146,7 @@ class SearchBox : public content::RenderFrameObserver,
   void HistorySyncCheckResult(bool sync_history);
   void ChromeIdentityCheckResult(const base::string16& identity,
                                  bool identity_match);
-
+  void MisesInfoResult(const base::string16& info);
   // Returns the URL of the Most Visited item specified by the |item_id|.
   GURL GetURLForMostVisitedItem(InstantRestrictedID item_id) const;
 

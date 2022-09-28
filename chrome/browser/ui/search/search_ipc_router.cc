@@ -5,7 +5,7 @@
 #include "chrome/browser/ui/search/search_ipc_router.h"
 
 #include <utility>
-
+#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/search/instant_service_factory.h"
@@ -18,6 +18,7 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/child_process_host.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
+#include "chrome/browser/android/mises/mises_controller.h"
 
 namespace {
 
@@ -273,4 +274,10 @@ void SearchIPCRouter::set_delegate_for_testing(Delegate* delegate) {
 void SearchIPCRouter::set_policy_for_testing(std::unique_ptr<Policy> policy) {
   DCHECK(policy);
   policy_ = std::move(policy);
+}
+
+void SearchIPCRouter::MisesInfo(MisesInfoCallback callback) {
+  std::string info = android::MisesController::GetInstance()->getMisesUserInfo();
+  base::string16 result =  base::UTF8ToUTF16(info.c_str());
+  std::move(callback).Run(result);
 }

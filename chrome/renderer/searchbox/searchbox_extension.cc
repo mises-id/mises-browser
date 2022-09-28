@@ -47,6 +47,7 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 #include "v8/include/v8.h"
+#include "chrome/browser/android/mises/mises_controller.h"
 
 namespace internal {  // for testing.
 
@@ -369,6 +370,17 @@ SearchBox* GetSearchBoxForCurrentContext() {
   return SearchBox::Get(main_frame);
 }
 
+static const char kDispatchMisesInfoResult[] =
+    "if (window.chrome &&"
+    "    window.chrome.embeddedSearch &&"
+    "    window.chrome.embeddedSearch.mises &&"
+    "    window.chrome.embeddedSearch.mises.oninfo &&"
+    "    typeof window.chrome.embeddedSearch.mises"
+    "        .oninfo === 'function') {"
+    "  window.chrome.embeddedSearch.mises.oninfo(%s);"
+    "  true;"
+    "}";
+
 static const char kDispatchChromeIdentityCheckResult[] =
     "if (window.chrome &&"
     "    window.chrome.embeddedSearch &&"
@@ -458,6 +470,40 @@ static const char kDispatchThemeChangeEventScript[] =
     "}";
 
 // ----------------------------------------------------------------------------
+class MisesBindings : public gin::Wrappable<MisesBindings> {
+ public:
+  static gin::WrapperInfo kWrapperInfo;
+
+  MisesBindings();
+  ~MisesBindings() override;
+
+ private:
+  // gin::Wrappable.
+  gin::ObjectTemplateBuilder GetObjectTemplateBuilder(
+      v8::Isolate* isolate) final;
+
+  // Handlers for JS properties.
+  static void GetInfo();
+
+  DISALLOW_COPY_AND_ASSIGN(MisesBindings);
+};
+gin::WrapperInfo MisesBindings::kWrapperInfo = {gin::kEmbedderNativeGin};
+
+MisesBindings::MisesBindings() = default;
+
+MisesBindings::~MisesBindings() = default;
+
+gin::ObjectTemplateBuilder MisesBindings::GetObjectTemplateBuilder(
+    v8::Isolate* isolate) {
+  return gin::Wrappable<MisesBindings>::GetObjectTemplateBuilder(isolate)
+      .SetMethod("info", &MisesBindings::GetInfo);
+}
+
+void MisesBindings::GetInfo() {
+  SearchBox* search_box = GetSearchBoxForCurrentContext();
+  if (!search_box) return ;
+  search_box->MisesInfo();  
+} 
 
 class SearchBoxBindings : public gin::Wrappable<SearchBoxBindings> {
  public:
@@ -873,6 +919,11 @@ void SearchBoxExtension::Install(blink::WebLocalFrame* frame) {
   if (newtabpage_controller.IsEmpty())
     return;
 
+  gin::Handle<MisesBindings> mises_controller =
+      gin::CreateHandle(isolate, new MisesBindings());
+  if (mises_controller.IsEmpty())
+    return;
+
   v8::Handle<v8::Object> chrome =
       content::GetOrCreateChromeObject(isolate, context->Global());
   v8::Local<v8::Object> embedded_search = v8::Object::New(isolate);
@@ -880,9 +931,17 @@ void SearchBoxExtension::Install(blink::WebLocalFrame* frame) {
                        searchbox_controller.ToV8());
   embedded_search->Set(gin::StringToV8(isolate, "newTabPage"),
                        newtabpage_controller.ToV8());
+  embedded_search->Set(gin::StringToV8(isolate, "mises"),
+                       mises_controller.ToV8());
   chrome->Set(gin::StringToSymbol(isolate, "embeddedSearch"), embedded_search);
 }
 
+void SearchBoxExtension::DispatchMisesInfoResult(blink::WebLocalFrame* frame, const base::string16& info) {
+  std::string escaped_info = base::GetQuotedJSONString(info);
+  blink::WebString script(blink::WebString::FromUTF8(base::StringPrintf(
+      kDispatchMisesInfoResult, escaped_info.c_str())));
+  Dispatch(frame, script);
+}
 // static
 void SearchBoxExtension::DispatchChromeIdentityCheckResult(
     blink::WebLocalFrame* frame,

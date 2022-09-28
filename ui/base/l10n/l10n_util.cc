@@ -699,6 +699,8 @@ std::string GetStringUTF8(int message_id) {
 base::string16 GetStringUTF16(int message_id) {
   ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
   base::string16 str = rb.GetLocalizedString(message_id);
+  base::ReplaceSubstringsAfterOffset(&str, 0, base::UTF8ToUTF16("kiwi").c_str(), base::UTF8ToUTF16("mises"));
+  base::ReplaceSubstringsAfterOffset(&str, 0, base::UTF8ToUTF16("Kiwi").c_str(), base::UTF8ToUTF16("Mises"));
   AdjustParagraphDirectionality(&str);
 
   return str;
@@ -743,6 +745,9 @@ base::string16 GetStringFUTF16(int message_id,
   base::string16 formatted = base::ReplaceStringPlaceholders(
       format_string, replacements, offsets);
   AdjustParagraphDirectionality(&formatted);
+
+  base::ReplaceSubstringsAfterOffset(&formatted, 0, base::UTF8ToUTF16("kiwi").c_str(), base::UTF8ToUTF16("mises"));
+  base::ReplaceSubstringsAfterOffset(&formatted, 0, base::UTF8ToUTF16("Kiwi").c_str(), base::UTF8ToUTF16("Mises"));
 
   return formatted;
 }

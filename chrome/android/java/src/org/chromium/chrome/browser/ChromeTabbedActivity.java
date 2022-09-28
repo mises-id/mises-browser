@@ -16,6 +16,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ShortcutManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -50,6 +51,8 @@ import org.chromium.base.metrics.CachedMetrics.EnumeratedHistogramSample;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.chrome.R;
+import org.chromium.chrome.browser.init.ChromeBrowserReferrer;
+import org.chromium.chrome.browser.init.InAppUpdater;
 import org.chromium.chrome.browser.IntentHandler.IntentHandlerDelegate;
 import org.chromium.chrome.browser.IntentHandler.TabOpenType;
 import org.chromium.chrome.browser.appmenu.AppMenu;
@@ -136,6 +139,7 @@ import org.chromium.chrome.browser.widget.emptybackground.EmptyBackgroundViewWra
 import org.chromium.components.feature_engagement.EventConstants;
 import org.chromium.components.feature_engagement.FeatureConstants;
 import org.chromium.components.feature_engagement.Tracker;
+import org.chromium.components.url_formatter.UrlFormatter;
 import org.chromium.content_public.browser.ContentVideoView;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.content_public.browser.WebContents;
@@ -295,6 +299,8 @@ public class ChromeTabbedActivity
 
     // Time at which an intent was received and handled.
     private long mIntentHandlingTimeMs;
+    
+    private InAppUpdater mInAppUpdater = new InAppUpdater();
 
     private class TabbedAssistStatusHandler extends AssistStatusHandler {
         public TabbedAssistStatusHandler(Activity activity) {
@@ -511,6 +517,18 @@ public class ChromeTabbedActivity
 
     @Override
     public void onNewIntent(Intent intent) {
+        if (intent != null) {
+            if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_MAIN)) {
+                String url = intent.getStringExtra("mises_url");
+                if (url != null && !url.isEmpty()) {
+                    url = UrlFormatter.fixupUrl(url);
+                    Intent newintent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    newintent.setPackage(getPackageName());
+                    startActivity(newintent);
+                }
+		
+            }
+        }
         // The intent to use in maybeDispatchExplicitMainViewIntent(). We're explicitly
         // adding NEW_TASK flag to make sure backing from CCT brings up the caller activity,
         // and not Chrome
@@ -584,6 +602,9 @@ public class ChromeTabbedActivity
             if (!isShowingPromo && isShowingPromo == true) {
                 ToolbarButtonInProductHelpController.maybeShowColdStartIPH(this);
             }
+            
+	    ChromeBrowserReferrer.handleInstallReferrer(this);
+	    mInAppUpdater.startCheck(this);
 
             super.finishNativeInitialization();
         } finally {
@@ -674,7 +695,14 @@ public class ChromeTabbedActivity
         }
 
         maybeStartMonitoringForScreenshots();
+    	mInAppUpdater.onResume(this);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+       	mInAppUpdater.onActivityResult(requestCode,resultCode,data);	
+    }  
 
     private void maybeStartMonitoringForScreenshots() {
         // Part of the (more runtime-related) check to determine whether to trigger help UI is

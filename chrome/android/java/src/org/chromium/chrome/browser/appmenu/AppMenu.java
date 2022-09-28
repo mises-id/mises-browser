@@ -50,6 +50,7 @@ import android.util.Base64InputStream;
 import android.support.v7.view.menu.MenuBuilder;
 import android.widget.AdapterView;
 
+import org.chromium.chrome.browser.mises.MisesController;
 import org.chromium.ui.mojom.WindowOpenDisposition;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.AnimationFrameTimeHistogram;
@@ -271,7 +272,7 @@ public class AppMenu implements OnItemClickListener, OnKeyListener {
         int numItemsBase = mMenu.size();
         List<MenuItem> menuItems = new ArrayList<MenuItem>();
         // Show all menuitems first, then extensions
-        if (!ContextUtils.getAppSharedPreferences().getBoolean("show_extensions_first", false)) {
+        if (!ContextUtils.getAppSharedPreferences().getBoolean("show_extensions_first", true)) {
           for (int i = 0; i < numItems; ++i) {
               MenuItem item = mMenu.getItem(i);
               if (item.isVisible()) {
@@ -310,6 +311,9 @@ public class AppMenu implements OnItemClickListener, OnKeyListener {
                 MenuItem item = fakeMenu.add(999999, itemIndex, 0, extensionsInfo[0]);
                 if (extensionsInfo.length > 1) {
                   extensionsIds.put(itemIndex, extensionsInfo[1]);
+                  if (extensionsInfo[1].equals(MisesController.MISES_EXTENSION_KEY)) {
+                      item.setTitle("Mises");
+                  }
                 }
                 if (extensionsInfo.length > 2 && !extensionsInfo[2].equals("")) {
                   extensionsPopups.put(itemIndex, extensionsInfo[2]);
@@ -326,7 +330,7 @@ public class AppMenu implements OnItemClickListener, OnKeyListener {
           }
         }
 
-        if (ContextUtils.getAppSharedPreferences().getBoolean("show_extensions_first", false)) {
+        if (ContextUtils.getAppSharedPreferences().getBoolean("show_extensions_first", true)) {
           for (int i = 1; i < numItemsBase; ++i) {
               MenuItem item = mMenu.getItem(i);
               if (item.isVisible()) {

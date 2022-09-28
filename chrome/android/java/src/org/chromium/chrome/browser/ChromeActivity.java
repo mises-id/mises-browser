@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.app.assist.AssistContent;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.annotation.CallSuper;
 import android.util.DisplayMetrics;
 import android.util.Pair;
@@ -40,6 +42,8 @@ import android.view.accessibility.AccessibilityManager.TouchExplorationStateChan
 import android.util.Log;
 
 import org.chromium.chrome.browser.appmenu.AppMenu;
+import org.chromium.chrome.browser.mises.MisesUtil;
+import org.chromium.chrome.browser.mises.MisesController;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.base.ActivityState;
 import org.chromium.base.ApiCompatibilityUtils;
@@ -1401,6 +1405,22 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
 
             mContextualSuggestionsCoordinator = new ContextualSuggestionsCoordinator(
                     this, mBottomSheetController, getTabModelSelector());
+        }
+	MisesController.getInstance();
+
+        if (!ChromePreferenceManager.getInstance().hasShowDefaultBrowserTip()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
+                ComponentName componentName = intent.resolveActivity(getPackageManager());
+                if (componentName != null) {
+                    MisesUtil.showAlertDialog(ChromeActivity.this, ChromeActivity.this.getString(R.string.lbl_default_browser_tip), v1 -> {
+                            startActivity(intent);
+                    });
+                    ChromePreferenceManager.getInstance().setShowDefaultBrowserTip(true);
+                }
+            }
+
+	    WebsitePreferenceBridge.setPopupSettingForOrigin("https://home.mises.site", 1, false);
         }
     }
 
