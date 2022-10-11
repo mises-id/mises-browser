@@ -1319,6 +1319,7 @@ enum HistogramValue {
   USERSPRIVATE_GETCURRENTUSER,
   MISESPRIVATE_SETMISESID,
   MISESPRIVATE_GETINSTALLREFERRER,
+  MISESPRIVATE_GETAPPSTATE,
   // Last entry: Add new entries above, then run:
   // python tools/metrics/histograms/update_extension_histograms.py
   ENUM_BOUNDARY

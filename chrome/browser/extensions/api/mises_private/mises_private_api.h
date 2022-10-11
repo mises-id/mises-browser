@@ -40,6 +40,18 @@ protected:
   ~MisesPrivateGetInstallReferrerFunction() override;
 
 };
+
+class MisesPrivateGetAppStateFunction : public UIThreadExtensionFunction
+{
+public:
+  ExtensionFunction::ResponseAction Run() override;
+  DECLARE_EXTENSION_FUNCTION("misesPrivate.getAppState",
+                             MISESPRIVATE_GETAPPSTATE)
+
+protected:
+  ~MisesPrivateGetAppStateFunction() override;
+
+};
  
 }  // namespace extensions
  
